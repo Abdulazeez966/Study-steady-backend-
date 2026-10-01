@@ -50,7 +50,67 @@ async function loginUser({ email, password }) {
   return { user, token };
 }
 
+
+async function updateAccount(userId, { name, email, currentPassword, newPassword }) {
+  const user = await User.findById(userId);
+  if (!user) {
+    const error = new Error('Account not found');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  const nextName = name === undefined ? user.name : String(name).trim();
+  const nextEmail = email === undefined ? user.email : String(email).trim().toLowerCase();
+
+  if (!nextName) {
+    const error = new Error('Name is required');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  if (!nextEmail || !/^\S+@\S+\.\S+$/.test(nextEmail)) {
+    const error = new Error('Please enter a valid email address');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  if (nextEmail !== user.email) {
+    const existing = await User.findOne({ email: nextEmail, _id: { $ne: userId } });
+    if (existing) {
+      const error = new Error('Email already in use');
+      error.statusCode = 409;
+      throw error;
+    }
+  }
+
+  if (newPassword !== undefined && newPassword !== '') {
+    if (!currentPassword) {
+      const error = new Error('Current password is required to change your password');
+      error.statusCode = 400;
+      throw error;
+    }
+    const matches = await bcrypt.compare(currentPassword, user.password);
+    if (!matches) {
+      const error = new Error('Current password is incorrect');
+      error.statusCode = 400;
+      throw error;
+    }
+    if (String(newPassword).length < 8) {
+      const error = new Error('New password must be at least 8 characters');
+      error.statusCode = 400;
+      throw error;
+    }
+    user.password = await bcrypt.hash(String(newPassword), SALT_ROUNDS);
+  }
+
+  user.name = nextName;
+  user.email = nextEmail;
+  await user.save();
+  return user;
+}
+
 module.exports = {
   registerUser,
   loginUser,
+  updateAccount,
 };

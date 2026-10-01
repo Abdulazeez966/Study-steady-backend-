@@ -6,6 +6,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 router.post('/start', authMiddleware, activityController.startActivity);
 router.put('/:id/complete', authMiddleware, activityController.completeActivity);
 router.put('/:id/snooze', authMiddleware, activityController.snoozeActivity);
+router.put('/:id/reset', authMiddleware, activityController.resetActivity);
 router.get('/', authMiddleware, activityController.getActivities);
 router.get('/:id', authMiddleware, activityController.getActivityById);
 

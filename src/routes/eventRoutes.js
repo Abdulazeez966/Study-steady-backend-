@@ -6,6 +6,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 router.get('/', authMiddleware, eventController.getEvents);
 router.get('/:id', authMiddleware, eventController.getEventById);
 router.put('/:id', authMiddleware, eventController.updateEvent);
+router.delete('/:id', authMiddleware, eventController.deleteEvent);
 router.put('/:id/pause', authMiddleware, eventController.pauseEvent);
 router.put('/:id/resume', authMiddleware, eventController.resumeEvent);
 router.put('/:id/reminders', authMiddleware, eventController.updateReminders);
