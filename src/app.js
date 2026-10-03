@@ -13,6 +13,7 @@ const activityRoutes = require('./routes/activityRoutes');
 const progressRoutes = require('./routes/progressRoutes');
 const reminderRoutes = require('./routes/reminderRoutes');
 const recoveryRoutes = require('./routes/recoveryRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 
 const app = express();
 
@@ -53,6 +54,7 @@ app.use('/api/activities', authMiddleware, activityRoutes);
 app.use('/api/progress', authMiddleware, progressRoutes);
 app.use('/api/reminders', authMiddleware, reminderRoutes);
 app.use('/api/recovery', authMiddleware, recoveryRoutes);
+app.use('/api/notifications', authMiddleware, notificationRoutes);
 
 // Error handler (must be last)
 app.use(errorHandler);

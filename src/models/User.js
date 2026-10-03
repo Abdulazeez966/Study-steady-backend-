@@ -20,7 +20,12 @@ const userSchema = new mongoose.Schema(
     },
     lastActiveAt: {
       type: Date,
-      default: Date.now, // drives inactivity/catch-up detection (Flow C)
+      default: Date.now, // drives inactivity/catch-up detection and active reminder windows
+    },
+    timezone: {
+      type: String,
+      default: 'UTC',
+      trim: true,
     },
   },
   { timestamps: true }

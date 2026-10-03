@@ -146,37 +146,10 @@ async function getActivityById(req, res, next) {
   }
 }
 
-async function resetActivity(req, res, next) {
-  try {
-    const userId = req.user.id;
-    const { id } = req.params;
-
-    const activity = await Activity.findOne({ _id: id, user: userId });
-    if (!activity) {
-      return res.status(404).json({ success: false, message: 'Activity not found' });
-    }
-
-    await Activity.deleteOne({ _id: activity._id, user: userId });
-    await Event.findOneAndUpdate(
-      { _id: activity.event, user: userId },
-      { status: 'upcoming' },
-      { new: true }
-    );
-
-    return res.status(200).json({
-      success: true,
-      message: 'Activity reset',
-    });
-  } catch (error) {
-    next(error);
-  }
-}
-
 module.exports = {
   startActivity,
   completeActivity,
   snoozeActivity,
-  resetActivity,
   getActivities,
   getActivityById,
 };

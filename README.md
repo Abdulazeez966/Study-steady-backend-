@@ -177,3 +177,47 @@ Create a Render Web Service from this repository:
 - Render provides `PORT` automatically.
 
 After deployment, verify `https://YOUR-RENDER-SERVICE.onrender.com/health` returns `{ "success": true, "data": { "status": "ok" } }`.
+
+## Account deletion
+
+Authenticated users can permanently delete their account with:
+
+`DELETE /api/auth/account`
+
+Send the current password in the JSON body:
+
+`{"password":"your-current-password"}`
+
+The endpoint deletes the user and their goals, plans, events, activities, and reminder preferences. A valid Bearer token is required.
+
+
+## Task reminders
+
+The backend now supports task reminders in three local-time periods:
+
+- Morning: 8:00 AM (early in-app window: 5:30–8:00 AM)
+- Afternoon: 2:00 PM (early in-app window: 11:00 AM–2:00 PM)
+- Evening: 6:00 PM (early in-app window: 3:30–6:00 PM)
+
+The browser reports the user's IANA time zone to `POST /api/auth/presence`. The backend uses that time zone when deciding when a reminder is due. If the user is active in the app during an early window, an in-app notification can be created before the scheduled email/reminder time. At the scheduled time, the backend creates the in-app notification and attempts to send an email once.
+
+### Email setup
+
+Email delivery uses the Resend API without requiring another npm dependency. Add these Render environment variables:
+
+```text
+RESEND_API_KEY=your_resend_api_key
+EMAIL_FROM=StudySteady <reminders@your-verified-domain.com>
+```
+
+The `EMAIL_FROM` address/domain must be verified with your email provider. If the variables are not configured, in-app reminders still work and email delivery is skipped with a server log message.
+
+### In-app notifications
+
+Authenticated clients can use:
+
+- `GET /api/notifications`
+- `PUT /api/notifications/:id/read`
+- `PUT /api/notifications/read-all`
+
+The frontend polls for new notifications while the user is signed in.

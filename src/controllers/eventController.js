@@ -50,22 +50,6 @@ async function updateEvent(req, res, next) {
   }
 }
 
-async function deleteEvent(req, res, next) {
-  try {
-    const userId = req.user.id;
-    const { id } = req.params;
-
-    await eventService.deleteEvent(userId, id);
-
-    res.status(200).json({
-      success: true,
-      message: 'Event deleted',
-    });
-  } catch (error) {
-    next(error);
-  }
-}
-
 async function pauseEvent(req, res, next) {
   try {
     const userId = req.user.id;
@@ -124,7 +108,6 @@ module.exports = {
   getEvents,
   getEventById,
   updateEvent,
-  deleteEvent,
   pauseEvent,
   resumeEvent,
   updateReminders,

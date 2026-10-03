@@ -1,4 +1,5 @@
 const authService = require('../services/authService');
+const accountService = require('../services/accountService');
 
 async function register(req, res, next) {
   try {
@@ -55,27 +56,38 @@ async function login(req, res, next) {
   }
 }
 
-
-async function updateAccount(req, res, next) {
+async function deleteAccount(req, res, next) {
   try {
-    const { name, email, currentPassword, newPassword } = req.body || {};
+    const { password } = req.body || {};
 
-    const user = await authService.updateAccount(req.user.id, {
-      name,
-      email,
-      currentPassword,
-      newPassword,
-    });
+    if (!password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password is required to delete your account',
+      });
+    }
+
+    await accountService.deleteAccount(req.user.id, password);
 
     res.status(200).json({
       success: true,
-      message: 'Account updated successfully',
-      data: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-      },
+      message: 'Account and associated data deleted successfully',
     });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function updatePresence(req, res, next) {
+  try {
+    const timezone = typeof req.body?.timezone === 'string' && req.body.timezone.trim()
+      ? req.body.timezone.trim()
+      : undefined;
+    const User = require('../models/User');
+    const update = { lastActiveAt: new Date() };
+    if (timezone) update.timezone = timezone;
+    await User.findByIdAndUpdate(req.user.id, update);
+    res.status(200).json({ success: true, data: { updated: true } });
   } catch (error) {
     next(error);
   }
@@ -84,5 +96,6 @@ async function updateAccount(req, res, next) {
 module.exports = {
   register,
   login,
-  updateAccount,
+  deleteAccount,
+  updatePresence,
 };

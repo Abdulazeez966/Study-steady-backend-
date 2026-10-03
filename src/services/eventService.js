@@ -1,5 +1,4 @@
 const Event = require('../models/Event');
-const Activity = require('../models/Activity');
 
 const MAX_PAUSE_DAYS = 90;
 
@@ -75,20 +74,6 @@ async function updateEvent(userId, eventId, { scheduledDate, estimatedMinutes, s
   return event;
 }
 
-async function deleteEvent(userId, eventId) {
-  const event = await Event.findOne({ _id: eventId, user: userId });
-  if (!event) {
-    const error = new Error('Event not found');
-    error.statusCode = 404;
-    throw error;
-  }
-
-  // Remove any activity linked to this scheduled occurrence so the deleted
-  // event cannot leave an orphaned activity behind.
-  await Activity.deleteMany({ event: event._id, user: userId });
-  await Event.deleteOne({ _id: event._id, user: userId });
-}
-
 async function pauseEvent(userId, eventId, returnDate) {
   validateReturnDate(returnDate);
   const event = await Event.findOneAndUpdate(
@@ -136,7 +121,6 @@ module.exports = {
   listEvents,
   getEventById,
   updateEvent,
-  deleteEvent,
   pauseEvent,
   resumeEvent,
   updateReminderOverride,
